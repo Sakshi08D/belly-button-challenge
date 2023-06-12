@@ -1,6 +1,5 @@
 // Use D3 to load the json data
 d3.json("https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/14-Interactive-Web-Visualizations/02-Homework/samples.json").then((data) => {
-
   // Create variables for your data for easier access
   let samples = data.samples;
   let metadata = data.metadata;
@@ -17,6 +16,7 @@ d3.json("https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1
       type: "bar",
       orientation: "h"
     }];
+
     Plotly.newPlot("bar", barData);
 
     // Create bubble chart
@@ -31,6 +31,7 @@ d3.json("https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1
         colorscale: "Earth"
       }
     }];
+
     Plotly.newPlot("bubble", bubbleData);
   }
 
@@ -38,9 +39,21 @@ d3.json("https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1
   function showMetadata(sample) {
     let sampleMetadata = metadata.filter(m => m.id == sample)[0];
     let metadataDisplay = d3.select("#sample-metadata");
+
     metadataDisplay.html("");
     Object.entries(sampleMetadata).forEach(([key, value]) => {
       metadataDisplay.append("h6").text(`${key}: ${value}`);
+    });
+  }
+
+  // Function to populate the dropdown menu
+  function initDropdown() {
+    let dropdown = d3.select("#selDataset");
+
+    samples.forEach((sample) => {
+      dropdown.append("option")
+      .text(sample.id)
+      .property("value", sample.id);
     });
   }
 
@@ -48,10 +61,14 @@ d3.json("https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1
   let firstSample = samples[0].id;
   drawCharts(firstSample);
   showMetadata(firstSample);
+  initDropdown();  // Populate the dropdown
 
   // Dropdown menu change handler
   d3.selectAll("#selDataset").on("change", function() {
-    let newSample = d3.select(this).property("value");
+    // Get the value of the dropdown menu
+    let newSample = d3.select("#selDataset").node().value;
+
+    // Update the charts and metadata with the newly selected sample
     drawCharts(newSample);
     showMetadata(newSample);
   });
